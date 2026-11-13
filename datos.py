@@ -7,7 +7,7 @@ def cargar_paises():
 
     try:
         #Se abre en modo lectura
-        with open("paises.csv", "r", encoding="utf-8") as archivo:
+        with open("paises.csv", "r", encoding="utf-8-sig") as archivo:
             lector = csv.DictReader(archivo)
 
             for fila in lector:
