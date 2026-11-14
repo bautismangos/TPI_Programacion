@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+paises.csv.bak
+paises.csv.tmp
+.env
+.env.*
+!.env.example
+api_key.txt
