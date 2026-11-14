@@ -1,4 +1,6 @@
 
+import funciones
+
 # ==========================================
 # MODULO: CONSULTAS Y FILTROS DE PAISES
 # ==========================================
@@ -155,16 +157,16 @@ def menu_consultas(paises):
         print("4. Filtrar por superficie")
         print("5. Volver al menu principal")
 
-        opcion = input("Seleccione una opcion: ").strip()
+        opcion = funciones.leer_entrada("Seleccione una opcion: ").strip()
 
         if opcion == "1":
 
-            nombre = input("Ingrese el nombre del pais: ")
+            nombre = funciones.leer_entrada("Ingrese el nombre del pais: ")
 
             print("\n1. Coincidencia exacta")
             print("2. Coincidencia parcial")
 
-            tipo = input("Seleccione el tipo de busqueda: ").strip()
+            tipo = funciones.leer_entrada("Seleccione el tipo de busqueda: ").strip()
 
             if tipo == "1":
                 resultados = buscar_por_nombre(paises, nombre, True)
@@ -180,7 +182,7 @@ def menu_consultas(paises):
 
         elif opcion == "2":
 
-            continente = input("Ingrese el continente: ")
+            continente = funciones.leer_entrada("Ingrese el continente: ")
 
             resultados = filtrar_por_continente(paises, continente)
 
@@ -188,8 +190,8 @@ def menu_consultas(paises):
 
         elif opcion == "3":
 
-            minimo = input("Ingrese la poblacion minima: ")
-            maximo = input("Ingrese la poblacion maxima: ")
+            minimo = funciones.leer_entrada("Ingrese la poblacion minima: ")
+            maximo = funciones.leer_entrada("Ingrese la poblacion maxima: ")
 
             resultados = filtrar_por_poblacion(paises, minimo, maximo)
 
@@ -197,8 +199,8 @@ def menu_consultas(paises):
 
         elif opcion == "4":
 
-            minimo = input("Ingrese la superficie minima: ")
-            maximo = input("Ingrese la superficie maxima: ")
+            minimo = funciones.leer_entrada("Ingrese la superficie minima: ")
+            maximo = funciones.leer_entrada("Ingrese la superficie maxima: ")
 
             resultados = filtrar_por_superficie(paises, minimo, maximo)
 
