@@ -53,10 +53,10 @@ def menu_principal():
             match opcion:
 
                 case "1":
-                    agregar_nuevo_pais(paises)
+                    funciones.agregar_nuevo_pais(paises)
 
                 case "2":
-                    modificar_pais(paises)
+                    funciones.modificar_pais(paises)
 
                 case "3":
                     consultas.menu_consultas(paises)
@@ -65,7 +65,7 @@ def menu_principal():
                     funciones.orden_paises(ruta_csv)
 
                 case "5":
-                    menu_estadisticas(ruta_csv)
+                    funciones.menu_estadisticas(ruta_csv)
 
                 case "6":
                     print("\nGracias por utilizar el sistema.")
