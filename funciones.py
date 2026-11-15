@@ -1,6 +1,7 @@
 import csv
 import math
 import statistics
+import datos
 
 # Pide un texto obligatorio y repite hasta que sea valido.
 # Devuelve None si el usuario deja el campo vacio (cancela la operacion).
@@ -129,7 +130,6 @@ def menu_estadisticas(ruta_csv):
         print("3. Promedio de superficie")
         print("4. Cantidad de paises por continente")
         print("5. Volver al menu principal")
-        print("6. Salir de estadisticas")
 
         opcion = funciones.leer_entrada("Seleccione una opcion: ").strip()
 
@@ -149,10 +149,6 @@ def menu_estadisticas(ruta_csv):
 
             case "5":
                 print("Volviendo al menu principal...")
-                return
-
-            case "6":
-                print("Saliendo de estadisticas...")
                 return
 
             case _:
