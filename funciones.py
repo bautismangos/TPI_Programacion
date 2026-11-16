@@ -1,7 +1,21 @@
 import csv
-import math
 import statistics
+import unicodedata
+
 import datos
+
+# Continentes permitidos, escritos igual que en el CSV
+CONTINENTES = ("América", "Europa", "Asia", "África", "Oceanía")
+
+
+# Quita tildes y pasa a minusculas para comparar textos sin distinguir acentos.
+def normalizar_texto(texto):
+    sin_tildes = unicodedata.normalize("NFKD", texto)
+    return "".join(
+        caracter for caracter in sin_tildes
+        if not unicodedata.combining(caracter)
+    ).strip().lower()
+
 
 # Pide un texto obligatorio y repite hasta que sea valido.
 # Devuelve None si el usuario deja el campo vacio (cancela la operacion).
@@ -9,13 +23,13 @@ def pedir_texto_obligatorio(mensaje):
 
     while True:
 
-        entrada = funciones.leer_entrada(mensaje)
+        entrada = leer_entrada(mensaje)
 
         if entrada.strip() == "":
             print("Operacion cancelada.")
             return None
 
-        texto = funciones.pedir_texto(entrada)
+        texto = pedir_texto(entrada)
 
         if texto is not None:
             return texto
@@ -27,7 +41,7 @@ def pedir_entero_positivo(mensaje):
 
     while True:
 
-        entrada = funciones.leer_entrada(mensaje).strip()
+        entrada = leer_entrada(mensaje).strip()
 
         if entrada == "":
             print("Operacion cancelada.")
@@ -45,6 +59,28 @@ def pedir_entero_positivo(mensaje):
             continue
 
         return numero
+
+
+# Pide un continente de la lista permitida y repite hasta que sea valido.
+# Acepta mayusculas, minusculas y tildes (por ejemplo, "america" -> "América").
+# Devuelve None si el usuario deja el campo vacio (cancela la operacion).
+def pedir_continente():
+
+    opciones = " / ".join(CONTINENTES)
+
+    while True:
+
+        entrada = leer_entrada(f"Ingrese el continente ({opciones}): ").strip()
+
+        if entrada == "":
+            print("Operacion cancelada.")
+            return None
+
+        for continente in CONTINENTES:
+            if normalizar_texto(continente) == normalizar_texto(entrada):
+                return continente
+
+        print(f"Error: continente invalido. Opciones: {opciones}.")
 
 
 # ==========================================
@@ -66,7 +102,7 @@ def agregar_nuevo_pais(paises):
         print("Ese pais ya existe.")
         return
 
-    continente = pedir_texto_obligatorio("Ingrese el continente: ")
+    continente = pedir_continente()
 
     if continente is None:
         return
@@ -131,21 +167,21 @@ def menu_estadisticas(ruta_csv):
         print("4. Cantidad de paises por continente")
         print("5. Volver al menu principal")
 
-        opcion = funciones.leer_entrada("Seleccione una opcion: ").strip()
+        opcion = leer_entrada("Seleccione una opcion: ").strip()
 
         match opcion:
 
             case "1":
-                funciones.masymenos_poblacion(ruta_csv)
+                masymenos_poblacion(ruta_csv)
 
             case "2":
-                funciones.promedio_poblacion(ruta_csv)
+                promedio_poblacion(ruta_csv)
 
             case "3":
-                funciones.promedio_superficie(ruta_csv)
+                promedio_superficie(ruta_csv)
 
             case "4":
-                funciones.cantidad_continente(ruta_csv)
+                cantidad_continente(ruta_csv)
 
             case "5":
                 print("Volviendo al menu principal...")
@@ -188,37 +224,15 @@ def pedir_texto(texto):
 #pedir texto sirve para verificar si lo puesto es un texto, con la funcion replace permite poner nombres como 'Republica Dominicana'
 
 
-def pedir_numero(entrada):
-    entrada = str(entrada).strip()
-    if entrada == "":
-        print("Campo obligatorio")
-        return None
-    try:
-        # replace permite escribir el numero con coma o con punto (3,5 o 3.5)
-        numero = float(entrada.replace(",", "."))
-    except ValueError:
-        print("Ingrese solo numeros")
-        return None
-    # float() tambien acepta "nan" e "inf": los rechazamos
-    if not math.isfinite(numero):
-        print("Ingrese un numero valido")
-        return None
-    if numero < 0:
-        print("Ingrese solo numeros positivos")
-        return None
-    return numero
-#pedir numero verifica si lo puesto es un numero flotante, gracias a replace que permite las comas y puntos
-
-
 # Lee el CSV y devuelve una lista de filas, o None si no se puede leer
 def leer_filas(archivo):
     try:
         with open(archivo, "r", encoding="utf-8-sig") as r:
             lector = csv.DictReader(r)
             campos = lector.fieldnames or []
-            columnas = ("nombre", "poblacion", "superficie", "continente")
 
-            if any(columna not in campos for columna in columnas):
+            # Usamos las columnas definidas en datos.py para no repetir la lista
+            if any(columna not in campos for columna in datos.CAMPOS):
                 print("Error: el archivo CSV no tiene las columnas esperadas")
                 return None
 
@@ -231,33 +245,12 @@ def leer_filas(archivo):
         return None
 
 
-def esta_duplicado(pais, archivo):
-    # se compara sin espacios y sin importar mayusculas o minusculas
-    pais = pais.strip().lower()
-    try:
-        with open (archivo, "r", encoding="utf-8-sig") as r:
-            lector=csv.DictReader(r)
-            for fila in lector:
-                nombre = (fila.get("nombre") or "").strip().lower()
-                if nombre == pais:
-                    print("Pais duplicado")
-                    return True
-            return False
-    except FileNotFoundError:
-        print("El archivo no existe")
-        return False
-    except (OSError, csv.Error, UnicodeError):
-        print("Error al leer el archivo")
-        return False
-#devuelve falso si el pais no esta duplicado, verifica en el csv si hay algun pais con el mismo nombre
-
-
 def nombre_az(archivo):
     filas = leer_filas(archivo)
     if filas is None:
         return []
     try:
-        ordenado_az = sorted(filas, key=lambda x: x['nombre'])
+        ordenado_az = sorted(filas, key=lambda x: x['nombre'].lower())
         #explicar key lambda
         return ordenado_az
     except (KeyError, TypeError):
@@ -271,7 +264,7 @@ def nombre_za(archivo):
     if filas is None:
         return []
     try:
-        ordenado_za = sorted(filas, key=lambda x: x['nombre'], reverse=True)
+        ordenado_za = sorted(filas, key=lambda x: x['nombre'].lower(), reverse=True)
         #explicar key lambda
         return ordenado_za
     except (KeyError, TypeError):
@@ -435,7 +428,7 @@ def promedio_poblacion(archivo):
         print("Error: el archivo CSV tiene datos incorrectos")
         return None
     media_p = statistics.mean(poblaciones)
-    print(f"El promedio de la poblacion es: {media_p:.2f}")
+    print(f"El promedio de la poblacion es: {int(media_p)}")
     return media_p
 #calcula y printea el promedio de poblacion mundial
 
@@ -453,7 +446,7 @@ def promedio_superficie(archivo):
         print("Error: el archivo CSV tiene datos incorrectos")
         return None
     media_s = statistics.mean(superficie)
-    print(f"El promedio de la superficie es: {media_s:.2f}")
+    print(f"El promedio de la superficie es: {media_s:.2f} km²")
     return media_s
 #calcula y printea el promedio de superficie del territorio mundial
 
